@@ -38,6 +38,7 @@ std::string format_data_line(std::string hostname, std::string rack,
 }
 
 void main_task(void* arg) {
+  int err_count = 0;
   while (true) {
     auto bme = bme280::get();
     float temperature = bme->readTemperature();
@@ -53,7 +54,13 @@ void main_task(void* arg) {
     std::string line = format_data_line(host_name, "stratum", sensor_id,
                                         temperature, humidity, pressure);
     ESP_LOGI(TAG, "Sending %s", line.c_str());
-    ESP_ERROR_LOG(http_send::post(url, line));
+    esp_err_t err = http_send::post(url, line);
+    if (err != ESP_OK) {
+      LOG_IF_ESP_ERROR(err);
+      if (err_count++ > 4) {
+        esp_restart();
+      }
+    }
     vTaskDelay(reporting_interval_ms / portTICK_PERIOD_MS);
   }
   vTaskDelete(NULL);

@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "config.h"
+#include "macros.h"
 #include "esp_event.h"
 #include "esp_log.h"
 #include "esp_system.h"
@@ -120,18 +121,19 @@ void wifi_init_sta(void) {
   ESP_ERROR_CHECK(esp_netif_set_hostname(netif, "sensor1"));
 }
 
-void setup_wifi(void) {
+esp_err_t setup_wifi(void) {
   // Initialize NVS
   esp_err_t ret = nvs_flash_init();
   if (ret == ESP_ERR_NVS_NO_FREE_PAGES ||
       ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-    ESP_ERROR_CHECK(nvs_flash_erase());
-    ret = nvs_flash_init();
+    RETURN_IF_ESP_ERROR(nvs_flash_erase());
+    RETURN_IF_ESP_ERROR(nvs_flash_init());
   }
-  ESP_ERROR_CHECK(ret);
 
   ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
   wifi_init_sta();
+
+  return ESP_OK;
 }
 }  // namespace wifi
 }  // namespace lab_sensor
