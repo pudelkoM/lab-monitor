@@ -10,6 +10,7 @@ DIY lab monitoring with ESP32-S2 SoCs, InfluxDB and Grafana.
 - Docker
 - Arduino IDE
 - ESP32-S2 SoC(s)
+- Bosch BME280 sensor
 
 # Sensor
 
